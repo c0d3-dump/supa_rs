@@ -232,6 +232,7 @@ impl TableSchema {
                 &url,
                 body,
                 Some(&self.client.access_token.clone().unwrap_or("".to_owned())),
+                None,
             )
             .await?;
 

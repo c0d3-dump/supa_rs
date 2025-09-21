@@ -7,7 +7,7 @@ mod tests {
     async fn table_select() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -20,7 +20,7 @@ mod tests {
     async fn table_insert() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -40,7 +40,7 @@ mod tests {
     async fn table_eq() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -58,7 +58,7 @@ mod tests {
     async fn table_neq() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -76,7 +76,7 @@ mod tests {
     async fn table_lt() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -94,7 +94,7 @@ mod tests {
     async fn table_lte() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -112,7 +112,7 @@ mod tests {
     async fn table_gt() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -130,7 +130,7 @@ mod tests {
     async fn table_gte() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -148,7 +148,7 @@ mod tests {
     async fn table_like() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -166,7 +166,7 @@ mod tests {
     async fn table_ilike() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -184,7 +184,7 @@ mod tests {
     async fn table_is() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -202,7 +202,7 @@ mod tests {
     async fn table_in_a() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -220,7 +220,7 @@ mod tests {
     async fn table_contains() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -238,7 +238,7 @@ mod tests {
     async fn table_contained_by() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -256,7 +256,7 @@ mod tests {
     async fn table_not() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);
@@ -274,7 +274,7 @@ mod tests {
     async fn table_or() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);

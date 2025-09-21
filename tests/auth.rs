@@ -10,10 +10,18 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn login() {
+    async fn anonymous_login() {
+        let client = SupabaseClient::new(None, None);
+        let res = client.anonymous_login().await;
+
+        println!("{:?}", res);
+    }
+
+    #[tokio::test]
+    async fn email_login() {
         let client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         println!("{:?}", res);
@@ -21,26 +29,26 @@ mod tests {
 
     #[tokio::test]
     async fn user() {
-        let client = SupabaseClient::new(None, None);
+        let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        let res = client.user(&res.unwrap().data.unwrap().access_token).await;
+        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let res = client.user().await;
 
         println!("{:?}", res);
     }
 
     #[tokio::test]
     async fn logout() {
-        let client = SupabaseClient::new(None, None);
+        let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        let res = client
-            .logout(&res.unwrap().data.unwrap().access_token)
-            .await;
+        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let res = client.logout().await;
 
         println!("{:?}", res);
     }

@@ -6,7 +6,7 @@ mod tests {
     async fn table_delete() {
         let mut client = SupabaseClient::new(None, None);
         let res = client
-            .login("prubruttadaja-3961@yopmail.com", "12345678")
+            .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
         client.set_session(&res.unwrap().data.unwrap().access_token);

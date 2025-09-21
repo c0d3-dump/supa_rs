@@ -13,6 +13,7 @@ pub enum Method {
     POST,
     DELETE,
     PATCH,
+    PUT,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -23,8 +24,11 @@ pub struct Response<T> {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Error {
-    pub code: String,
+    pub code: Option<String>,
+    #[serde(rename = "statusCode")]
+    pub status_code: Option<String>,
     pub error_code: Option<String>,
+    pub error: Option<String>,
     pub msg: Option<String>,
     pub message: Option<String>,
     pub details: Option<String>,
@@ -70,6 +74,7 @@ impl SupabaseClient {
         path: &str,
         body: serde_json::Value,
         access_token: Option<&str>,
+        form: Option<reqwest::multipart::Form>,
     ) -> Result<Response<String>, Error> {
         let url = format!("{}/{}", self.base_url, path);
 
@@ -79,6 +84,7 @@ impl SupabaseClient {
             Method::POST => client.post(&url),
             Method::DELETE => client.delete(&url),
             Method::PATCH => client.patch(&url),
+            Method::PUT => client.put(&url),
         };
 
         let prefer_return = if url.contains("select=") {
@@ -87,33 +93,43 @@ impl SupabaseClient {
             "return=minimal"
         };
 
-        let res = builder
-            .header("apikey", self.api_key.clone())
-            .header("Content-Type", "application/json")
-            .header(
-                "Authorization",
-                format!("Bearer {}", access_token.unwrap_or("")),
-            )
-            .header("Prefer", prefer_return)
-            .json(&body)
-            .send()
-            .await
-            .map_err(|e| Error {
-                code: e
-                    .status()
+        let builder = if form.is_some() {
+            builder
+                .header("apikey", self.api_key.clone())
+                .header(
+                    "Authorization",
+                    format!("Bearer {}", access_token.unwrap_or("")),
+                )
+                .multipart(form.unwrap())
+        } else {
+            builder
+                .header("apikey", self.api_key.clone())
+                .header("Content-Type", "application/json")
+                .header(
+                    "Authorization",
+                    format!("Bearer {}", access_token.unwrap_or("")),
+                )
+                .header("Prefer", prefer_return)
+                .json(&body)
+        };
+
+        let res = builder.send().await.map_err(|e| Error {
+            code: Some(
+                e.status()
                     .unwrap_or(StatusCode::INTERNAL_SERVER_ERROR)
                     .as_str()
                     .to_string(),
-                msg: Some(e.to_string()),
-                error_code: None,
-                details: None,
-                message: None,
-            })?;
-
-        dbg!(&res);
+            ),
+            msg: Some(e.to_string()),
+            error_code: None,
+            details: None,
+            message: None,
+            error: None,
+            status_code: None,
+        })?;
 
         let status = res.status();
-        let txt = res.text().await.unwrap();
+        let txt = res.text().await.unwrap_or("".to_string());
 
         if status == StatusCode::OK
             || status == StatusCode::CREATED
@@ -127,19 +143,79 @@ impl SupabaseClient {
 
         match serde_json::from_str::<Error>(&txt) {
             Ok(res) => Err(Error {
-                code: status.as_str().to_string(),
+                code: Some(status.as_str().to_string()),
                 error_code: res.error_code,
                 msg: res.msg,
                 message: res.message,
                 details: res.details,
+                error: res.error,
+                status_code: None,
             }),
             Err(_) => Err(Error {
-                code: status.as_str().to_string(),
+                code: Some(status.as_str().to_string()),
                 msg: None,
                 error_code: None,
                 details: None,
                 message: None,
+                error: None,
+                status_code: None,
             }),
         }
+    }
+
+    pub async fn request_bytes(
+        &self,
+        path: &str,
+        access_token: Option<&str>,
+    ) -> Result<Response<Vec<u8>>, Error> {
+        let url = format!("{}/{}", self.base_url, path);
+
+        let client = reqwest::Client::new();
+        let res = client
+            .get(&url)
+            .header("apikey", self.api_key.clone())
+            .header(
+                "Authorization",
+                format!("Bearer {}", access_token.unwrap_or("")),
+            )
+            .send()
+            .await
+            .map_err(|e| Error {
+                code: Some(
+                    e.status()
+                        .unwrap_or(StatusCode::INTERNAL_SERVER_ERROR)
+                        .as_str()
+                        .to_string(),
+                ),
+                msg: Some(e.to_string()),
+                error_code: None,
+                details: None,
+                message: None,
+                error: None,
+                status_code: None,
+            })?;
+
+        let status = res.status();
+        let bytes = res.bytes().await.unwrap_or(vec![].into());
+
+        if status == StatusCode::OK
+            || status == StatusCode::CREATED
+            || status == StatusCode::NO_CONTENT
+        {
+            return Ok(Response {
+                code: status.as_u16(),
+                data: Some(bytes.to_vec()),
+            });
+        }
+
+        Err(Error {
+            code: Some(status.as_str().to_string()),
+            error_code: None,
+            error: None,
+            msg: None,
+            message: None,
+            details: None,
+            status_code: None,
+        })
     }
 }
