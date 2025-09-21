@@ -216,7 +216,7 @@ impl TableSchema {
         let method = if self.insert.is_some() {
             body = self.insert.clone().unwrap();
             Method::POST
-        } else if self.delete == true {
+        } else if self.delete {
             Method::DELETE
         } else if self.update.is_some() {
             body = self.update.clone().unwrap();
@@ -237,7 +237,7 @@ impl TableSchema {
             .await?;
 
         let txt = res.data.unwrap();
-        let data = if &txt == "" {
+        let data = if txt.is_empty() {
             json!({})
         } else {
             serde_json::from_str(&txt).unwrap()

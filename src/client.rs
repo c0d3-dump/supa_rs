@@ -95,14 +95,14 @@ impl SupabaseClient {
             "return=minimal"
         };
 
-        let builder = if form.is_some() {
+        let builder = if let Some(form) = form {
             builder
                 .header("apikey", self.api_key.clone())
                 .header(
                     "Authorization",
                     format!("Bearer {}", access_token.unwrap_or("")),
                 )
-                .multipart(form.unwrap())
+                .multipart(form)
         } else {
             builder
                 .header("apikey", self.api_key.clone())

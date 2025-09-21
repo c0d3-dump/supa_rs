@@ -18,10 +18,10 @@ impl SupabaseClient {
             .as_secs() as i64;
 
         let mut has_expired = true;
-        if let Ok(claims) = decode_jwt(&access_token) {
-            if let Some(exp) = claims.exp {
-                has_expired = exp <= time_now;
-            }
+        if let Ok(claims) = decode_jwt(access_token)
+            && let Some(exp) = claims.exp
+        {
+            has_expired = exp <= time_now;
         }
 
         if !has_expired {
