@@ -6,6 +6,7 @@ pub struct SupabaseClient {
     pub base_url: String,
     pub api_key: String,
     pub access_token: Option<String>,
+    pub refresh_token: Option<String>,
 }
 
 pub enum Method {
@@ -65,6 +66,7 @@ impl SupabaseClient {
             base_url: base_url.unwrap(),
             api_key: api_key.unwrap(),
             access_token: None,
+            refresh_token: None,
         }
     }
 

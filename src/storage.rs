@@ -26,6 +26,12 @@ pub struct MessageResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SignedUrlResponse {
+    #[serde(rename = "signedURL")]
+    pub url: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FileResponse {
     #[serde(rename = "Key")]
     pub key: String,
@@ -55,7 +61,20 @@ pub struct FileMetadata {
     pub last_modified: String,
 }
 
+#[derive(Debug, Clone)]
+pub struct BucketSchema {
+    pub client: SupabaseClient,
+    pub name: String,
+}
+
 impl SupabaseClient {
+    pub fn bucket(&self, name: &str) -> BucketSchema {
+        BucketSchema {
+            client: self.clone(),
+            name: name.to_string(),
+        }
+    }
+
     pub async fn create_bucket(&self, name: &str, public: bool) -> Result<Response<String>, Error> {
         self.request(
             Method::POST,
@@ -87,14 +106,17 @@ impl SupabaseClient {
             data: serde_json::from_str(&res.data.unwrap()).unwrap(),
         })
     }
+}
 
-    pub async fn get_bucket(&self, bucket_id: &str) -> Result<Response<BucketResponse>, Error> {
+impl BucketSchema {
+    pub async fn get_bucket(&self) -> Result<Response<BucketResponse>, Error> {
         let res = self
+            .client
             .request(
                 Method::GET,
-                &format!("storage/v1/bucket/{}", bucket_id),
+                &format!("storage/v1/bucket/{}", self.name),
                 json!({}),
-                Some(&self.access_token.clone().unwrap_or("".to_owned())),
+                Some(&self.client.access_token.clone().unwrap_or("".to_owned())),
                 None,
             )
             .await?;
@@ -107,15 +129,15 @@ impl SupabaseClient {
 
     pub async fn update_bucket(
         &self,
-        bucket_id: &str,
         data: UpdateRequest,
     ) -> Result<Response<MessageResponse>, Error> {
         let res = self
+            .client
             .request(
                 Method::PUT,
-                &format!("storage/v1/bucket/{}", bucket_id),
+                &format!("storage/v1/bucket/{}", self.name),
                 serde_json::to_value(data).unwrap(),
-                Some(&self.access_token.clone().unwrap_or("".to_owned())),
+                Some(&self.client.access_token.clone().unwrap_or("".to_owned())),
                 None,
             )
             .await?;
@@ -126,13 +148,14 @@ impl SupabaseClient {
         })
     }
 
-    pub async fn delete_bucket(&self, bucket_id: &str) -> Result<Response<MessageResponse>, Error> {
+    pub async fn delete_bucket(&self) -> Result<Response<MessageResponse>, Error> {
         let res = self
+            .client
             .request(
                 Method::DELETE,
-                &format!("storage/v1/bucket/{}", bucket_id),
+                &format!("storage/v1/bucket/{}", self.name),
                 json!({}),
-                Some(&self.access_token.clone().unwrap_or("".to_owned())),
+                Some(&self.client.access_token.clone().unwrap_or("".to_owned())),
                 None,
             )
             .await?;
@@ -143,9 +166,8 @@ impl SupabaseClient {
         })
     }
 
-    pub async fn upload_file(
+    pub async fn upload(
         &self,
-        bucket_name: &str,
         file_path: &str,
         file_data: Vec<u8>,
         upsert: bool,
@@ -160,19 +182,18 @@ impl SupabaseClient {
 
         // TODO: upsert is not working
         let res = self
+            .client
             .request(
                 Method::POST,
                 &format!(
                     "storage/v1/object/{}/{}?upsert={}",
-                    bucket_name, file_path, upsert
+                    self.name, file_path, upsert
                 ),
                 json!({}),
-                Some(&self.access_token.clone().unwrap_or("".to_owned())),
+                Some(&self.client.access_token.clone().unwrap_or("".to_owned())),
                 Some(form),
             )
             .await?;
-
-        dbg!(&res);
 
         Ok(Response {
             code: res.code,
@@ -180,28 +201,25 @@ impl SupabaseClient {
         })
     }
 
-    pub async fn get_file(
-        &self,
-        bucket_name: &str,
-        file_path: &str,
-    ) -> Result<Response<Vec<u8>>, Error> {
-        self.request_bytes(
-            &format!("storage/v1/object/{}/{}", bucket_name, file_path),
-            Some(&self.access_token.clone().unwrap_or("".to_owned())),
-        )
-        .await
+    pub async fn get(&self, file_path: &str) -> Result<Response<Vec<u8>>, Error> {
+        self.client
+            .request_bytes(
+                &format!("storage/v1/object/{}/{}", self.name, file_path),
+                Some(&self.client.access_token.clone().unwrap_or("".to_owned())),
+            )
+            .await
     }
 
-    pub async fn list_files_in_bucket(
+    pub async fn list(
         &self,
-        bucket_name: &str,
         limit: i32,
         offset: i32,
     ) -> Result<Response<Vec<FilesResponse>>, Error> {
         let res = self
+            .client
             .request(
                 Method::POST,
-                &format!("storage/v1/object/list/{}", bucket_name),
+                &format!("storage/v1/object/list/{}", self.name),
                 json!({
                         "limit": limit,
                         "offset": offset,
@@ -211,7 +229,7 @@ impl SupabaseClient {
                             "order": "asc",
                         },
                 }),
-                Some(&self.access_token.clone().unwrap_or("".to_owned())),
+                Some(&self.client.access_token.clone().unwrap_or("".to_owned())),
                 None,
             )
             .await?;
@@ -219,6 +237,90 @@ impl SupabaseClient {
         Ok(Response {
             code: res.code,
             data: serde_json::from_str(&res.data.unwrap()).unwrap(),
+        })
+    }
+
+    pub async fn search(
+        &self,
+        term: &str,
+        limit: i32,
+    ) -> Result<Response<Vec<FilesResponse>>, Error> {
+        let res = self
+            .client
+            .request(
+                Method::POST,
+                &format!("storage/v1/object/list/{}", self.name),
+                json!({
+                    "search": term,
+                    "limit": limit,
+                    "prefix": ""
+                }),
+                Some(&self.client.access_token.clone().unwrap_or("".to_owned())),
+                None,
+            )
+            .await?;
+
+        Ok(Response {
+            code: res.code,
+            data: serde_json::from_str(&res.data.unwrap()).unwrap(),
+        })
+    }
+
+    pub async fn delete(&self, file_path: &str) -> Result<Response<MessageResponse>, Error> {
+        let res = self
+            .client
+            .request(
+                Method::DELETE,
+                &format!("storage/v1/object/{}/{}", self.name, file_path),
+                json!({}),
+                Some(&self.client.access_token.clone().unwrap_or("".to_owned())),
+                None,
+            )
+            .await?;
+
+        Ok(Response {
+            code: res.code,
+            data: serde_json::from_str(&res.data.unwrap()).unwrap(),
+        })
+    }
+
+    pub async fn get_public_url(&self, file_path: &str) -> Result<Response<String>, Error> {
+        Ok(Response {
+            code: 200,
+            data: format!(
+                "{}/storage/v1/object/public/{}/{}",
+                self.client.base_url, self.name, file_path
+            )
+            .into(),
+        })
+    }
+
+    pub async fn get_signed_url(
+        &self,
+        file_path: &str,
+        expires_in: i64,
+    ) -> Result<Response<String>, Error> {
+        let res = self
+            .client
+            .request(
+                Method::POST,
+                &format!("storage/v1/object/sign/{}/{}", self.name, file_path),
+                json!({
+                    "expiresIn": expires_in
+                }),
+                Some(&self.client.access_token.clone().unwrap_or("".to_owned())),
+                None,
+            )
+            .await?;
+
+        let signed_url: SignedUrlResponse = serde_json::from_str(&res.data.unwrap()).unwrap();
+
+        Ok(Response {
+            code: res.code,
+            data: Some(format!(
+                "{}/storage/v1{}",
+                self.client.base_url, signed_url.url
+            )),
         })
     }
 }

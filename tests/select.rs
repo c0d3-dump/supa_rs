@@ -10,7 +10,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client.from("test").select("*").execute().await;
 
         println!("{:?}", res);
@@ -23,7 +26,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .insert(json!({
@@ -43,7 +49,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
@@ -61,7 +70,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
@@ -79,7 +91,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
@@ -97,7 +112,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
@@ -115,7 +133,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
@@ -133,7 +154,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
@@ -151,7 +175,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
@@ -169,7 +196,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
@@ -187,7 +217,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
@@ -205,7 +238,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
@@ -223,7 +259,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
@@ -241,7 +280,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
@@ -259,7 +301,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
@@ -277,7 +322,10 @@ mod tests {
             .email_login("prubruttadaja-3961@yopmail.com", "12345678")
             .await;
 
-        client.set_session(&res.unwrap().data.unwrap().access_token);
+        let tokens = res.unwrap().data.unwrap();
+        client
+            .set_session(&tokens.access_token, &tokens.refresh_token)
+            .await;
         let res = client
             .from("test")
             .select("*")
