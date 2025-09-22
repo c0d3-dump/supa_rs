@@ -54,22 +54,47 @@ pub struct UserResponse {
 }
 
 impl SupabaseClient {
-    pub fn new(mut base_url: Option<String>, mut api_key: Option<String>) -> Self {
-        dotenv::dotenv().ok();
-
-        if base_url.is_none() && api_key.is_none() {
-            base_url = Some(std::env::var("SUPABASE_URL").expect("require valid SUPABASE_URL"));
-            api_key = Some(std::env::var("SUPABASE_KEY").expect("require vaid SUPABASE_KEY"));
-        }
-
+    pub fn new() -> Self {
         Self {
-            base_url: base_url.unwrap(),
-            api_key: api_key.unwrap(),
+            base_url: "".to_string(),
+            api_key: "".to_string(),
             access_token: None,
             refresh_token: None,
         }
     }
 
+    pub fn load_env(self) -> Self {
+        dotenv::dotenv().ok();
+
+        Self {
+            base_url: std::env::var("SUPABASE_URL").expect("require valid SUPABASE_URL"),
+            api_key: std::env::var("SUPABASE_KEY").expect("require vaid SUPABASE_KEY"),
+            access_token: None,
+            refresh_token: None,
+        }
+    }
+
+    pub fn base_url(self, url: &str) -> Self {
+        Self {
+            base_url: url.to_string(),
+            api_key: self.api_key,
+            access_token: None,
+            refresh_token: None,
+        }
+    }
+
+    pub fn api_key(self, key: &str) -> Self {
+        Self {
+            base_url: self.base_url,
+            api_key: key.to_string(),
+            access_token: None,
+            refresh_token: None,
+        }
+    }
+}
+
+// base requests
+impl SupabaseClient {
     pub async fn request(
         &self,
         method: Method,
