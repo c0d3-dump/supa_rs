@@ -1,3 +1,4 @@
+use serde::de::DeserializeOwned;
 use serde_json::json;
 
 use crate::client::{Error, Method, Response, SupabaseClient};
@@ -196,7 +197,10 @@ impl TableSchema {
         self.clone()
     }
 
-    pub async fn execute(&self) -> Result<Response<serde_json::Value>, Error> {
+    pub async fn execute<T>(&self) -> Result<Response<T>, Error>
+    where
+        T: DeserializeOwned,
+    {
         let mut url = format!("rest/v1/{}", self.name);
 
         let mut cmd = "?";
@@ -243,9 +247,11 @@ impl TableSchema {
             serde_json::from_str(&txt).unwrap()
         };
 
+        let t: T = serde_json::from_value(data).unwrap();
+
         Ok(Response {
             code: res.code,
-            data: Some(data),
+            data: Some(t),
         })
     }
 }
