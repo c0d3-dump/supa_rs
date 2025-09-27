@@ -120,7 +120,7 @@ impl SupabaseClient {
             "return=minimal"
         };
 
-        let builder = if access_token.unwrap() != "" {
+        let builder = if access_token.unwrap_or("") != "" {
             builder
                 .header("apikey", self.api_key.clone())
                 .header(
