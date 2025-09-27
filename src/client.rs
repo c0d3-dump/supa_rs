@@ -120,22 +120,24 @@ impl SupabaseClient {
             "return=minimal"
         };
 
-        let builder = if let Some(form) = form {
+        let builder = if access_token.unwrap() != "" {
             builder
                 .header("apikey", self.api_key.clone())
                 .header(
                     "Authorization",
-                    format!("Bearer {}", access_token.unwrap_or("")),
+                    format!("Bearer {}", access_token.unwrap()),
                 )
-                .multipart(form)
         } else {
             builder
                 .header("apikey", self.api_key.clone())
+        };
+
+        let builder = if let Some(form) = form {
+            builder
+                .multipart(form)
+        } else {
+            builder
                 .header("Content-Type", "application/json")
-                .header(
-                    "Authorization",
-                    format!("Bearer {}", access_token.unwrap_or("")),
-                )
                 .header("Prefer", prefer_return)
                 .json(&body)
         };
