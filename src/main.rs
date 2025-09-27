@@ -12,7 +12,7 @@ async fn main() -> Result<()> {
 
     let user = client.user().await;
     
-    dbg!(user);
+    println!("{:?}", user);
 
     Ok(())
 }

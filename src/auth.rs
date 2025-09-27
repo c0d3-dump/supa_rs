@@ -8,7 +8,7 @@ use crate::{
 };
 
 impl SupabaseClient {
-    pub async fn set_session(&mut self, access_token: &str, refresh_token: &str) {
+    pub async fn set_session(&mut self, access_token: &str, refresh_token: &str) -> LoginResponse {
         self.access_token = Some(access_token.to_owned());
         self.refresh_token = Some(refresh_token.to_owned());
 
@@ -25,7 +25,7 @@ impl SupabaseClient {
         }
 
         if !has_expired {
-            return;
+            return LoginResponse{ access_token: access_token.to_owned(), refresh_token:refresh_token.to_owned() }
         }
 
         match self.refresh_token().await {
@@ -37,6 +37,11 @@ impl SupabaseClient {
             Err(e) => {
                 dbg!(e);
             }
+        }
+
+        LoginResponse{ 
+            access_token: self.access_token.clone().unwrap().to_owned(), 
+            refresh_token: self.refresh_token.clone().unwrap().to_owned() 
         }
     }
 
@@ -104,9 +109,10 @@ impl SupabaseClient {
         let res = self
             .request(
                 Method::POST,
-                "auth/v1/token?grant_type=refresh_token",
+                "auth/v1/token",
                 json!({
-                    "refresh_token": self.refresh_token.clone().unwrap()
+                    "refresh_token": self.refresh_token.clone().unwrap(),
+                    "grant_type": "refresh_token"
                 }),
                 None,
                 None,
